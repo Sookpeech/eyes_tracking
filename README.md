@@ -5,6 +5,10 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 [![GitHub stars](https://img.shields.io/github/stars/antoinelame/GazeTracking.svg?style=social)](https://github.com/antoinelame/GazeTracking/stargazers)
 
+# Memo
+C:\Users\82109\GazeTracking\gaze_tracking\trained_models\shape_predictor_68_face_landmarks.dat
+파일도 업로드 해야 하는데 용량때문에 업로드 X
+
 This is a Python (2 and 3) library that provides a **webcam-based eye tracking system**. It gives you the exact position of the pupils and the gaze direction, in real time.
 
 [![Demo](https://i.imgur.com/WNqgQkO.gif)](https://youtu.be/YEZMk1P0-yw)
