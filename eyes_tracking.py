@@ -1,8 +1,3 @@
-"""
-Demonstration of the GazeTracking library.
-Check the README.md for complete documentation.
-"""
-
 import cv2
 from gaze_tracking import GazeTracking
 import cv2
@@ -31,12 +26,23 @@ pTime = 0
 # 자세가 바르지 않은 시간을 세는 변수
 count = 0
 # 각 제스처를 몇 초동안 했는지 세는 변수
-eye_count = 0
-face_count = 0
-script_count = 0
+eye_count = 0 # 주변
+face_count = 0 # 얼굴
+script_count = 0 # 대본
 # 프레임 변수
 f_count = 0
 
+# face
+f_before = 0
+f_present = 0
+
+# script
+s_before = 0
+s_present = 0
+
+# face movement
+m_before = 0
+m_present = 0
 # 눈 깜박임 횟수 보정값
 correction = duration / 20
 
@@ -46,6 +52,11 @@ while True:
     # We get a new frame from the webcam
     _, img = cap.read()
     
+    # 원하는 프레임 단위로 cut
+    cap.set(cv2.CAP_PROP_POS_FRAMES,f_count/2);
+#     print(index)
+    f_count += FPS
+    
     # 동영상이 끝나면 break
     if (np.shape(img) == ()): break
         
@@ -54,18 +65,37 @@ while True:
 
     new_img = gaze.annotated_frame()
     text = ""
+    
+    if m_before == m_present and m_present == 1:
+        face_count += FPS/2
+            
+    if f_before == f_present and f_present == 1:
+        eye_count += FPS/2
+            
+    if s_before == s_present and s_present == 1:
+        script_count += FPS/2
+            
+    f_before = f_present
+    s_before = s_present
+    m_before = m_present
 
     if gaze.is_blinking():
-        script_count += 1
+        s_present = 1
         text = "Blinking"
-    elif gaze.is_right():
-        eye_count += 1
+    else:
+        s_present = 0
+        
+    if gaze.is_right():
+        f_present = 1
         text = "Looking right"
     elif gaze.is_left():
-        eye_count += 1
+        f_present = 1
         text = "Looking left"
-    elif gaze.is_center():
+    else:
+        f_present = 0
+    if gaze.is_center():
         text = "Looking center"
+        
 
     cv2.putText(new_img, text, (10, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (147, 58, 31), 2)
 
@@ -87,15 +117,12 @@ while True:
 
 # 얼굴 움직임 분석
         if (abs(nose.x - 0.5) >= (11 - sensitivity) * 0.1):
+            m_present = 1
             print("얼굴 움직임")
-            face_count += 1
 #             cv2.putText(img, "Please adjust your body to the standard.", (100,50), cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0), 3)
+        else:
+            m_present = 0
 
-# 시선 분산 분석
-#         if (abs(left_shoulder.y - right_shoulder.y) >= (11 - sensitivity) * 0.01):
-# #             print("두 어깨의 균형이 맞지 않습니다.")
-#             cv2.putText(img, "The posture is not correct.", (100,100), cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0), 3)
-#             count += 1
             
     cTime = time.time()
     fps = 1/(cTime-pTime)
